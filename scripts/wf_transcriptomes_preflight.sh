@@ -108,11 +108,15 @@ fi
 
 # ── Nextflow availability ─────────────────────────────────────────────────────
 
-if command -v nextflow &>/dev/null; then
+NEXTFLOW=/groups/tprice/pipelines/bin/nextflow
+if [[ -x "$NEXTFLOW" ]]; then
+    nf_version=$("$NEXTFLOW" -version 2>&1 | grep -oP 'version \K[0-9.]+' || echo "unknown")
+    ok "Nextflow $nf_version found at $NEXTFLOW"
+elif command -v nextflow &>/dev/null; then
     nf_version=$(nextflow -version 2>&1 | grep -oP 'version \K[0-9.]+' || echo "unknown")
-    ok "Nextflow $nf_version found"
+    ok "Nextflow $nf_version found on PATH"
 else
-    fail "nextflow not found in PATH — load it before submitting (module load nextflow or add to PATH)"
+    fail "Nextflow not found at $NEXTFLOW and not on PATH"
 fi
 
 if command -v apptainer &>/dev/null || command -v singularity &>/dev/null; then
