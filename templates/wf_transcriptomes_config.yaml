@@ -1,0 +1,42 @@
+# wf-transcriptomes config — pass to tjp-launch wf-transcriptomes --config <this file>
+# Produces a merged transcriptome GTF from raw ONT reads via StringTie2.
+# The merged GTF feeds directly into SQANTI3 as the 'isoforms:' input.
+
+# ── Required ──────────────────────────────────────────────────────────────────
+
+sample:         my_project
+fastq_dir:      /path/to/fastq_pass/          # parent dir containing barcode subdirs
+sample_sheet:   /path/to/sample_sheet.csv     # CSV: barcode,alias[,type]
+ref_genome:     /groups/tprice/pipelines/references/GRCh38.primary_assembly.genome.fa
+ref_annotation: /groups/tprice/pipelines/references/gencode.v47.primary_assembly.annotation.gtf
+
+# ── Pipeline version ──────────────────────────────────────────────────────────
+# Pin this for reproducibility. Check https://github.com/epi2me-labs/wf-transcriptomes/releases
+wf_version:     v2.3.0
+
+# ── ONT protocol ─────────────────────────────────────────────────────────────
+direct_rna:     false    # false = cDNA (PCR-amplified); true = direct RNA (native)
+
+# ── Assembly tuning ───────────────────────────────────────────────────────────
+minimap2_index_opts: "-k 15"   # -k 15 recommended for cDNA; leave blank for direct RNA
+min_read_length: 100
+min_qscore:      9
+
+# ── Feature toggles ───────────────────────────────────────────────────────────
+# de_analysis: run DESeq2 differential expression after assembly.
+# Requires 'type' column in sample_sheet (values: test / control).
+de_analysis:    false
+
+# ── Output ────────────────────────────────────────────────────────────────────
+outdir:         /work/${USER}/wf_transcriptomes/${sample}
+
+# ── Sample sheet format ───────────────────────────────────────────────────────
+# Minimal CSV (assembly only):
+#   barcode,alias
+#   barcode09,sample1
+#   barcode10,sample2
+#
+# With DE analysis (de_analysis: true):
+#   barcode,alias,type
+#   barcode09,sample1,test
+#   barcode10,sample2,control
