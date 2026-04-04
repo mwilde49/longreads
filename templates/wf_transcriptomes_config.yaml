@@ -12,7 +12,7 @@ ref_annotation: /groups/tprice/pipelines/references/gencode.v47.primary_assembly
 
 # ── Pipeline version ──────────────────────────────────────────────────────────
 # Pin this for reproducibility. Check https://github.com/epi2me-labs/wf-transcriptomes/releases
-wf_version:     v2.3.0
+wf_version:     v1.7.2
 
 # ── ONT protocol ─────────────────────────────────────────────────────────────
 direct_rna:     false    # false = cDNA (PCR-amplified); true = direct RNA (native)
