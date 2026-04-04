@@ -1,0 +1,12 @@
+sample:              hDRG_samples1-4
+fastq_dir:           /scratch/juno/maw210003/fastq/ont/samples1-4/fastq_pass
+sample_sheet:        /work/maw210003/pipelines/wf-transcriptomes/sample_sheet.csv
+ref_genome:          /groups/tprice/pipelines/references/GRCh38.primary_assembly.genome.fa
+ref_annotation:      /groups/tprice/pipelines/references/gencode.v48.primary_assembly.annotation.gtf
+wf_version:          v1.7.2
+direct_rna:          false
+minimap2_index_opts: "-k 15"
+min_read_length:     100
+min_qscore:          9
+de_analysis:         false
+outdir:              /scratch/juno/maw210003/pipelines/wf-transcriptomes/hDRG_samples1-4
