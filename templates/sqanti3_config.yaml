@@ -1,0 +1,42 @@
+# sqanti3 config — pass to tjp-launch sqanti3 --config <this file>
+# Runs QC → Filter → Rescue on a single assembled transcriptome GTF.
+# Stage 1a (long-read QC) and 1b (reference QC) run in parallel;
+# Filter follows 1a; Rescue follows both Filter and 1b.
+
+# ── Required ──────────────────────────────────────────────────────────────────
+
+sample:   my_sample
+isoforms: /path/to/assembled_transcriptome.gtf   # wf-transcriptomes, IsoSeq, FLAIR, etc.
+refGTF:   /groups/tprice/pipelines/references/gencode.v48.primary_assembly.annotation.gtf
+refFasta: /groups/tprice/pipelines/references/GRCh38.primary_assembly.genome.fa
+
+# ── Optional evidence (leave blank to omit) ───────────────────────────────────
+
+coverage:         ""    # STAR SJ.out.tab — highly recommended for junction classification
+fl_count:         ""    # Full-length counts TSV (IsoSeq / wf-transcriptomes output)
+CAGE_peak:        ""    # blank = use built-in human/mouse FANTOM5 data
+polyA_motif_list: ""    # blank = use built-in list
+polyA_peak:       ""
+
+# ── Technology ────────────────────────────────────────────────────────────────
+
+force_id_ignore: true   # true for Nanopore (STRG.x.x IDs); false for PacBio IsoSeq
+
+# ── Resources (auto-computed from GTF size if blank) ──────────────────────────
+# Overrides auto-detection. Leave blank to let the orchestrator decide.
+# Thresholds: <50K → 8 CPUs/16G/4 chunks; 50K-200K → 16/32G/8; 200K-1M → 32/128G/14
+
+cpus:   ""
+chunks: ""
+
+# ── Feature toggles ───────────────────────────────────────────────────────────
+
+skip_report:        true     # false = generate HTML report (slow, memory-intensive)
+skip_orf:           false    # true = skip TransDecoder ORF prediction (faster)
+filter_mode:        rules    # "rules" = deterministic (default); "ml" = machine learning
+filter_mono_exonic: false    # true = also filter mono-exonic isoforms
+rescue_mode:        automatic  # "automatic" (default); "full" = more permissive
+
+# ── Output ────────────────────────────────────────────────────────────────────
+
+outdir: /scratch/juno/${USER}/pipelines/sqanti3/${sample}

@@ -1,0 +1,23 @@
+sample:   hDRG_sample3
+isoforms: /scratch/juno/maw210003/pipelines/wf-transcriptomes/hDRG_samples1-4/gtf/sample3_annotated.gtf
+refGTF:   /groups/tprice/pipelines/references/gencode.v48.primary_assembly.annotation.gtf
+refFasta: /groups/tprice/pipelines/references/GRCh38.primary_assembly.genome.fa
+
+coverage:         ""
+fl_count:         ""
+CAGE_peak:        ""
+polyA_motif_list: ""
+polyA_peak:       ""
+
+force_id_ignore: true
+
+cpus:   ""
+chunks: ""
+
+skip_report:        true
+skip_orf:           false
+filter_mode:        rules
+filter_mono_exonic: false
+rescue_mode:        automatic
+
+outdir: /scratch/juno/maw210003/pipelines/sqanti3/hDRG_sample3
