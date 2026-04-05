@@ -19,8 +19,6 @@ direct_rna:     false    # false = cDNA (PCR-amplified); true = direct RNA (nati
 
 # ── Assembly tuning ───────────────────────────────────────────────────────────
 minimap2_index_opts: "-k 15"   # -k 15 recommended for cDNA; leave blank for direct RNA
-min_read_length: 100
-min_qscore:      9
 
 # ── Feature toggles ───────────────────────────────────────────────────────────
 # de_analysis: run DESeq2 differential expression after assembly.

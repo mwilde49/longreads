@@ -6,7 +6,5 @@ ref_annotation:      /groups/tprice/pipelines/references/gencode.v48.primary_ass
 wf_version:          v1.7.2
 direct_rna:          false
 minimap2_index_opts: "-k 15"
-min_read_length:     100
-min_qscore:          9
 de_analysis:         false
 outdir:              /scratch/juno/maw210003/pipelines/wf-transcriptomes/hDRG_samples1-4
