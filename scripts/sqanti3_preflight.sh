@@ -92,10 +92,10 @@ echo ""
 echo "[3/3] Chromosome name consistency"
 
 if [[ -f "$ISOFORMS" && -f "$REF_GTF" && -f "$REF_FASTA" ]]; then
-    # Extract first chromosome name from each source
-    ISO_CHR=$(grep -v '^#' "$ISOFORMS" | awk '{print $1}' | sort -u | head -1)
-    REF_CHR=$(grep -v '^#' "$REF_GTF"  | awk '{print $1}' | sort -u | head -1)
-    FA_CHR=$(grep '^>' "$REF_FASTA" | head -1 | sed 's/^>//; s/ .*//')
+    # Extract first chromosome name from each source (single-process awk avoids SIGPIPE with pipefail)
+    ISO_CHR=$(awk '!/^#/{print $1; exit}' "$ISOFORMS")
+    REF_CHR=$(awk '!/^#/{print $1; exit}' "$REF_GTF")
+    FA_CHR=$(awk '/^>/{print substr($1,2); exit}' "$REF_FASTA")
 
     ok "Isoforms GTF first chrom: $ISO_CHR"
     ok "RefGTF first chrom:       $REF_CHR"
