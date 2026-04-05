@@ -34,32 +34,34 @@ longreads/
     └── sqanti3_v5.5.4.sif              # Apptainer SIF (built from docker://anaconesalab/sqanti3:v5.5.4)
 ```
 
-**Not yet created** (planned):
+**Implemented (v5.5.0 / v6.0.0)** — all of the following exist in the HPC repo:
 ```
-containers/sqanti3/                       # git submodule → ConesaLab/SQANTI3 @ v5.5.4
-slurm_templates/
+containers/sqanti3/                       # this submodule (ConesaLab/SQANTI3 @ v5.5.4)
+  slurm_templates/                        # stage scripts live here (in submodule)
+    sqanti3_qc_slurm_template.sh          # Stage 1a: long-read QC  (32–128 GB, 16–32 CPUs)
+    sqanti3_refqc_slurm_template.sh       # Stage 1b: reference QC  (runs parallel to 1a)
+    sqanti3_filter_slurm_template.sh      # Stage 2: filter         (8 GB, 4 CPUs)
+    sqanti3_rescue_slurm_template.sh      # Stage 3: rescue         (16 GB, 8 CPUs)
+slurm_templates/ (HPC repo)
   sqanti3_slurm_template.sh              # Orchestrator: chains stages via SLURM --dependency
-  sqanti3_qc_slurm_template.sh           # Stage 1a: long-read QC  (32–128 GB, 16–32 CPUs)
-  sqanti3_refqc_slurm_template.sh        # Stage 1b: reference QC  (runs parallel to 1a)
-  sqanti3_filter_slurm_template.sh       # Stage 2: filter         (8 GB, 4 CPUs)
-  sqanti3_rescue_slurm_template.sh       # Stage 3: rescue         (16 GB, 8 CPUs)
-templates/
-  sqanti3_config.yaml                    # User-facing config template
-test_data/sqanti3/                       # Minimal GTF + genome slice for dev partition smoke test
-docs/
-  SQANTI3_HPC_GUIDE.md
+  wf_transcriptomes_slurm_template.sh    # wf-transcriptomes head job
+templates/ (HPC repo)
+  sqanti3/config.yaml                    # User-facing config template
+  sqanti3/samplesheet.csv               # Samplesheet template
+  wf-transcriptomes/config.yaml         # wf-transcriptomes config template
+  wf-transcriptomes/samplesheet.csv     # wf-transcriptomes samplesheet template
 ```
 
 ## SQANTI3 Architecture
 
-### Three stages with different resource envelopes
+### 4-stage DAG with different resource envelopes
 
 | Stage | Script | RAM | CPUs | Notes |
 |-------|--------|-----|------|-------|
-| QC (long-read) | `sqanti3_qc.py` | 32–256 GB | 16–32 | Scales with `-n chunks`; memory ≈ base × chunks |
-| QC (reference) | `sqanti3_qc.py` | 16 GB | 8 | Runs in parallel with long-read QC; required input for rescue |
-| Filter | `sqanti3_filter.py rules\|ml` | 8 GB | 4 | Fast; rules mode is default |
-| Rescue | `sqanti3_rescue.py` | 16 GB | 8 | Requires ref QC output (`ref_classification.txt`) |
+| 1a: QC (long-read isoforms) | `sqanti3_qc.py` | 32–256 GB | 16–32 | Scales with `-n chunks`; memory ≈ base × chunks |
+| 1b: QC (reference annotation) | `sqanti3_qc.py` | 16 GB | 8 | Runs in parallel with 1a; required input for rescue |
+| 2: Filter | `sqanti3_filter.py rules\|ml` | 8 GB | 4 | Depends on 1a; rules mode is default |
+| 3: Rescue | `sqanti3_rescue.py` | 16 GB | 8 | Depends on 2 and 1b; requires ref QC output (`ref_classification.txt`) |
 
 **Stages 1a and 1b are independent and must run as separate parallel SLURM jobs.** Stage 2 depends on 1a. Stage 3 depends on both 2 and 1b. The orchestrator handles `--dependency=afterok:` chaining.
 
@@ -138,3 +140,20 @@ rescue_mode:        automatic  # "automatic" or "full"
 sample: my_sample
 outdir: /work/${USER}/sqanti3/${sample}
 ```
+
+### Titan metadata fields (v6.0.0)
+
+Parent framework reads these optional fields from user config YAML:
+- `titan_project_id`, `titan_sample_id`, `titan_library_id`, `titan_run_id`
+
+The samplesheet template also has `project_id`, `sample_id`, `library_id`, `run_id` columns.
+These are all framework-level — do NOT add them to SQANTI3 CLI calls or wf-transcriptomes params.
+
+### wf-transcriptomes pipeline (also in this submodule)
+
+This submodule houses both SQANTI3 and wf-transcriptomes.
+The wf-transcriptomes pipeline uses Nextflow SLURM executor mode (executor = 'slurm')
+via `configs/wf_transcriptomes/juno.config`. The head job is submitted via the HPC repo's
+`slurm_templates/wf_transcriptomes_slurm_template.sh`.
+
+Typical workflow: wf-transcriptomes → (produces isoforms GTF) → SQANTI3
