@@ -14,7 +14,7 @@ force_id_ignore: true
 cpus:   ""
 chunks: ""
 
-skip_report:        true
+skip_report:        false
 skip_orf:           false
 filter_mode:        rules
 filter_mono_exonic: false
