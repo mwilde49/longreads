@@ -34,9 +34,9 @@ echo "  Config: $STAGE_CONFIG"
 echo "====================================================================="
 
 apptainer exec \
-    --writable-tmpfs \
     --env HOME=/tmp \
     --env PYTHONNOUSERSITE=1 \
+    --env R_LIBS_USER="${PROJECT_ROOT}/containers/sqanti3/r_libs" \
     --bind "${PROJECT_ROOT}:${PROJECT_ROOT}" \
     --bind "${SCRATCH_ROOT}:${SCRATCH_ROOT}" \
     --bind "${WORK_ROOT}:${WORK_ROOT}" \
