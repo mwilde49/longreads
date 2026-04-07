@@ -34,6 +34,7 @@ echo "  Config: $STAGE_CONFIG"
 echo "====================================================================="
 
 apptainer exec \
+    --writable-tmpfs \
     --env HOME=/tmp \
     --env PYTHONNOUSERSITE=1 \
     --bind "${PROJECT_ROOT}:${PROJECT_ROOT}" \
