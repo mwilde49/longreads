@@ -26,7 +26,12 @@ minimap2_index_opts: "-k 15"   # -k 15 recommended for cDNA; leave blank for dir
 de_analysis:    false
 
 # ── Output ────────────────────────────────────────────────────────────────────
-outdir:         /work/${USER}/wf_transcriptomes/${sample}
+# WARNING: set this to a literal absolute path — ${USER} and ${sample} are NOT
+# expanded by the pipeline's YAML parser. If left unresolved, Nextflow defaults
+# to ./output relative to the SLURM working directory ($HOME on Juno), which
+# will fill your home quota. Use your actual username and sample name, e.g.:
+#   outdir: /work/maw210003/pipelines/wf-transcriptomes/my_sample
+outdir:         /work/__USER__/pipelines/wf-transcriptomes/__SAMPLE__
 
 # ── Sample sheet format ───────────────────────────────────────────────────────
 # Minimal CSV (assembly only):

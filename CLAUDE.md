@@ -2,6 +2,26 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## Known Issues
+
+### wf-transcriptomes: outdir defaults to ~/output and fills home quota
+The config template previously used `${USER}` and `${sample}` in the `outdir` field,
+but the HPC pipeline's YAML parser (`yaml_get`) does not expand shell variables.
+When Nextflow receives an unresolved path, it falls back to `./output` relative to
+the SLURM working directory, which is `$HOME` on Juno — filling home disk quota.
+
+**Fix**: `outdir` in `templates/wf_transcriptomes_config.yaml` now uses `__USER__`
+and `__SAMPLE__` placeholders (consistent with the HPC-side template), and the
+SLURM template (`wf_transcriptomes_slurm_template.sh`) exits with an error if
+`outdir` is unset, non-absolute, or contains unexpanded `${...}` variables.
+
+**Users must set `outdir` to a literal absolute path in their config**, e.g.:
+```
+outdir: /work/maw210003/pipelines/wf-transcriptomes/my_sample
+```
+
+---
+
 ## Project Purpose
 
 This repository will contain a **SQANTI3 pipeline module** designed to plug into the TJP HPC ecosystem at https://github.com/mwilde49/hpc. SQANTI3 is a long-read transcriptome QC and curation tool (QC → Filter → Rescue stages) used after transcript collapse from PacBio IsoSeq or Oxford Nanopore data.
